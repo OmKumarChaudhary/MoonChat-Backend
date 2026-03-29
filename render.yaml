@@ -2,8 +2,8 @@ services:
   - type: web
     name: monchat-backend
     env: python
-    buildCommand: pip install -r requirements.txt && python nltk_setup.py
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python nltk_setup.py
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.12 # Required for TensorFlow 2.15.0 compatibility
+        value: 3.11.9 # Most stable version for TensorFlow 2.x

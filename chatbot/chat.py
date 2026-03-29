@@ -9,6 +9,15 @@ import os
 from pycoingecko import CoinGeckoAPI
 from utils.cache_manager import cache_manager
 
+# Configure NLTK to use the local data directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+NLTK_DATA_DIR = os.path.join(PROJECT_ROOT, 'nltk_data')
+
+# Ensure NLTK knows where to find its data
+if NLTK_DATA_DIR not in nltk.data.path:
+    nltk.data.path.append(NLTK_DATA_DIR)
+
 lemmatizer = WordNetLemmatizer()
 cg = CoinGeckoAPI()
 

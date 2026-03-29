@@ -22,8 +22,15 @@ def ask_chatbot():
             'status': 'success'
         }), 200
     except Exception as e:
-        print(f"Error in chatbot response: {e}")
-        return jsonify({'error': str(e)}), 500
+        import traceback
+        error_msg = f"Error in chatbot response: {e}"
+        print(error_msg)
+        traceback.print_exc()
+        return jsonify({
+            'error': str(e),
+            'status': 'error',
+            'details': 'Please check server logs for more info'
+        }), 500
 
 @chatbot_bp.route('/status', methods=['GET'])
 def chatbot_status():

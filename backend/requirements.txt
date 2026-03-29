@@ -1,0 +1,10 @@
+flask
+flask-cors
+pycoingecko
+requests
+gunicorn
+tensorflow-cpu
+nltk
+numpy
+pandas
+scikit-learn

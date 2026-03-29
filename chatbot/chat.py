@@ -7,6 +7,7 @@ import string
 import pandas as pd
 import os
 from pycoingecko import CoinGeckoAPI
+from utils.cache_manager import cache_manager
 
 lemmatizer = WordNetLemmatizer()
 cg = CoinGeckoAPI()
@@ -42,7 +43,7 @@ def predict_class(text):
     return classes[np.argmax(pred)]
 
 def get_crypto_price(text):
-    """Fetches real-time price for the mentioned coin."""
+    """Fetches real-time price for the mentioned coin with caching."""
     text_clean = text.lower()
     coin_map = {
         'btc': 'bitcoin', 'bitcoin': 'bitcoin',
@@ -75,19 +76,38 @@ def get_crypto_price(text):
             # Extract potential coin name
             query = text_clean.replace("price", "").replace("what is", "").replace("how much is", "").replace("of", "").replace("the", "").strip()
             if query:
-                search_results = cg.search(query=query)
-                if search_results.get('coins'):
-                    found_coin = search_results['coins'][0]['id']
+                # Check cache for search result first
+                search_cache_key = f"chatbot_search_{query}"
+                found_coin = cache_manager.get(search_cache_key, ttl=86400) # Search results can be cached long
+                
+                if not found_coin:
+                    search_results = cg.search(query=query)
+                    if search_results.get('coins'):
+                        found_coin = search_results['coins'][0]['id']
+                        cache_manager.set(search_cache_key, found_coin)
         except Exception:
             pass
 
     if found_coin:
+        # Check cache for price
+        price_cache_key = f"price_{found_coin}"
+        cached_price = cache_manager.get(price_cache_key, ttl=300) # 5 min TTL
+        
+        if cached_price:
+            return f"The current price of {found_coin.replace('-', ' ').capitalize()} is ${cached_price:,.2f} USD."
+
         try:
             price_data = cg.get_price(ids=found_coin, vs_currencies='usd')
             if found_coin in price_data:
                 price = price_data[found_coin]['usd']
+                # Save to cache
+                cache_manager.set(price_cache_key, price)
                 return f"The current price of {found_coin.replace('-', ' ').capitalize()} is ${price:,.2f} USD."
         except Exception:
+            # Fallback to last known price if available
+            last_price = cache_manager.get_last_resort(price_cache_key)
+            if last_price:
+                return f"The last known price of {found_coin.replace('-', ' ').capitalize()} was ${last_price:,.2f} USD (Live data currently unavailable)."
             return f"I found the coin '{found_coin}', but I couldn't fetch its live price right now."
     
     return "I can fetch real-time prices for almost any crypto! Try asking 'Price of Bitcoin' or 'How much is Solana?'"

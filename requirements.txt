@@ -3,7 +3,9 @@ flask-cors
 pycoingecko
 requests
 gunicorn
-numpy
+numpy<2.0.0
 pandas
 scikit-learn
 nltk
+tensorflow-cpu
+h5py

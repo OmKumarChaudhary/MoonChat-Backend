@@ -35,4 +35,8 @@ def ask_chatbot():
 @chatbot_bp.route('/status', methods=['GET'])
 def chatbot_status():
     """Check if the chatbot service is active."""
-    return jsonify({'status': 'online', 'message': 'MoonChat AI Assistant is ready'}), 200
+    return jsonify({
+        'status': 'online', 
+        'message': 'MoonChat AI Assistant is ready',
+        'version': '1.0.1-nltk-fix'
+    }), 200

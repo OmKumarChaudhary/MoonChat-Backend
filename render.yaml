@@ -6,4 +6,4 @@ services:
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.12 # Stable version for TF
+        value: 3.10.12 # Required for TensorFlow 2.15.0 compatibility

@@ -26,6 +26,6 @@ def home():
 if __name__ == '__main__':
     # Start the Flask development server
     # '0.0.0.0' makes the server accessible from other devices in the same network
-    # Render provides a 'PORT' environment variable
-    port = int(os.environ.get('PORT', 5000))
+    # Hugging Face Spaces defaults to port 7860
+    port = int(os.environ.get('PORT', 7860))
     app.run(host='0.0.0.0', port=port)
